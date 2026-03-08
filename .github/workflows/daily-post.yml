@@ -1,0 +1,64 @@
+# .github/workflows/daily-post.yml
+# ═══════════════════════════════════════════════════════════════
+# GitHub Actions — 100% FREE cron scheduler
+# Runs every day at 4:00 AM UTC = 9:00 AM Pakistan time (UTC+5)
+# This replaces ANY paid server scheduler
+# ═══════════════════════════════════════════════════════════════
+
+name: 🤖 Daily LinkedIn Post
+
+on:
+  schedule:
+    # Runs at 04:00 UTC = 09:00 AM Pakistan Standard Time
+    - cron: "0 4 * * *"
+
+  # Also allow manual trigger from GitHub UI (for testing)
+  workflow_dispatch:
+    inputs:
+      custom_topic:
+        description: "Custom topic (leave empty for auto)"
+        required: false
+        default: ""
+
+jobs:
+  generate-and-email:
+    name: Generate Post & Send Approval Email
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🤖 Run LinkedIn Agent Pipeline
+        env:
+          # ── AI (Google Gemini — Free) ──────────────────────
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+          # ── Images (Pexels — Free) ─────────────────────────
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+
+          # ── Email (Gmail — Free) ───────────────────────────
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          APPROVAL_EMAIL: ${{ secrets.APPROVAL_EMAIL }}
+
+          # ── Server URL (where approve links point to) ──────
+          BASE_URL: ${{ secrets.BASE_URL }}
+
+          # ── Custom topic (optional, from manual trigger) ───
+          CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic }}
+
+        run: node src/pipeline.js
+
+      - name: ✅ Pipeline complete
+        run: echo "Email sent to ${{ secrets.APPROVAL_EMAIL }} — waiting for approval!"
