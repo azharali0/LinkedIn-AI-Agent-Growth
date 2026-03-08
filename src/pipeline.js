@@ -26,8 +26,8 @@ async function runPipeline() {
 
     // Step 3: Build approval URLs (pointing to your free Koyeb server)
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    const approvalUrl = `${baseUrl}/approve/${postId}`;
-    const rejectUrl = `${baseUrl}/reject/${postId}`;
+    const approvalUrl = `${baseUrl}?action=approve&id=${postId}`;
+    const rejectUrl = `${baseUrl}?action=reject&id=${postId}`;
 
     // Step 4: Save pending post to file (persists on server)
     const pendingDir = path.join(__dirname, "../pending");
