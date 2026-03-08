@@ -1,18 +1,8 @@
-# .github/workflows/daily-post.yml
-# ═══════════════════════════════════════════════════════════════
-# GitHub Actions — 100% FREE cron scheduler
-# Runs every day at 4:00 AM UTC = 9:00 AM Pakistan time (UTC+5)
-# This replaces ANY paid server scheduler
-# ═══════════════════════════════════════════════════════════════
-
 name: 🤖 Daily LinkedIn Post
 
 on:
   schedule:
-    # Runs at 04:00 UTC = 09:00 AM Pakistan Standard Time
     - cron: "0 4 * * *"
-
-  # Also allow manual trigger from GitHub UI (for testing)
   workflow_dispatch:
     inputs:
       custom_topic:
@@ -40,24 +30,13 @@ jobs:
 
       - name: 🤖 Run LinkedIn Agent Pipeline
         env:
-          # ── AI (Google Gemini — Free) ──────────────────────
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
-          # ── Images (Pexels — Free) ─────────────────────────
-          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
-
-          # ── Email (Gmail — Free) ───────────────────────────
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          APPROVAL_EMAIL: ${{ secrets.APPROVAL_EMAIL }}
-
-          # ── Server URL (where approve links point to) ──────
-          BASE_URL: ${{ secrets.BASE_URL }}
-
-          # ── Custom topic (optional, from manual trigger) ───
-          CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic }}
-
+          GROQ_API_KEY:      ${{ secrets.GROQ_API_KEY }}
+          PEXELS_API_KEY:    ${{ secrets.PEXELS_API_KEY }}
+          APPS_SCRIPT_URL:   ${{ secrets.APPS_SCRIPT_URL }}
+          SECRET_TOKEN:      ${{ secrets.SECRET_TOKEN }}
+          APPROVAL_EMAIL:    ${{ secrets.APPROVAL_EMAIL }}
+          CUSTOM_TOPIC:      ${{ github.event.inputs.custom_topic }}
         run: node src/pipeline.js
 
       - name: ✅ Pipeline complete
-        run: echo "Email sent to ${{ secrets.APPROVAL_EMAIL }} — waiting for approval!"
+        run: echo "Done! Check email for approval."
